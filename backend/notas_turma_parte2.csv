@@ -1,0 +1,19 @@
+id_aluno,nome,email,nota_matematica,nota_historia
+1534b135-436f-4d6b-a6a5-62cf2a9b31ff,Felipe Rocha,felipe.rocha@example.com,9.5,11
+6411873b-19cc-42e6-92dc-3b02bc930243,Gabriela Alves,gabriela.alves@example.com,15,16.5
+c5d6e7f8-a9b0-4c1d-8e2f-4a5b6c7d8e14,,sem.nome@example.com,12,13
+3cc6fcfe-4be6-40b2-ba52-fcf542c4ef57,Heitor Ribeiro,heitor.ribeiro@example.com,8,13
+9be653bc-9d9f-4add-8916-f854c876359d,Isabela Ferreira,isabela.ferreira@example.com,17.5,18
+9be653bc-9d9f-4add-8916-f854c876359d,Isabela Ferreira,isabela.ferreira@example.com,17.5,18
+d6e7f8a9-b0c1-4d2e-9f3a-5b6c7d8e9f15,Bianca Torres,bianca.torres@example.com,-2,11
+318df849-7e39-497f-b164-f1af216bc89f,João Pedro Nunes,joao.nunes@example.com,12.5,9.5
+6d7e8f9a-0b1c-4d2e-b3f4-a5b6c7d8e705,Paula Teixeira,paula.teixeira@example.com,20,17
+,Caio Batista,caio.batista@example.com,14,15
+9e0f1a2b-3c4d-4e5f-a6b7-c8d9e0f1a806,Rafael Moreira,rafael.moreira@example.com,6.5,9
+4f5a6b7c-8d9e-4f0a-b1c2-d3e4f5a6b907,Sofia Cardoso,sofia.cardoso@example.com,14,12
+e7f8a9b0-c1d2-4e3f-8a4b-6c7d8e9f0a16,Sofia Cardoso,sofia.cardoso@example.com,18,18
+9e60bc82-891e-44d9-acbb-41fd575681c5,Ana Martins,ana.martins.nova@example.com,17,16
+7a8b9c0d-1e2f-4a3b-8c4d-e5f6a7b8c008,Thiago Ramos,thiago.ramos@example.com,10,15
+f8a9b0c1-d2e3-4f4a-9b5c-7d8e9f0a1b17,Daniela Prado,,13,14
+0b1c2d3e-4f5a-4b6c-9d7e-f8a9b0c1d209,Vitória Gomes,vitoria.gomes@example.com,16.5,7.5
+a9b0c1d2-e3f4-4a5b-8c6d-8e9f0a1b2c18,Henrique Lopes,henrique.lopes@example.com,15,20.5
