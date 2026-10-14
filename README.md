@@ -134,66 +134,13 @@ Estudantes podem consultar as próprias notas, notificações e pedidos de
 revisão. Professores podem gerir o cadastro, analisar pedidos, ajustar notas e
 acompanhar métricas e histórico de execuções.
 
-## O que cada item do frontend representa
+## Funcionalidades do painel
 
-O painel muda conforme o perfil autenticado. Os números e listas são
-carregados da API; os itens de navegação do professor e do estudante não são
-iguais.
+- **Professor:** importa CSV, gerencia estudantes e períodos, decide pedidos
+  de revisão e acompanha execuções e métricas.
+- **Estudante:** consulta notas e notificações e solicita revisão de nota.
 
-### Perfil de professor
-
-- **Visão geral:** resumo da base atual, total de boletins, pedidos de revisão
-  pendentes e quantidade de estudantes. Mostra os estudantes adicionados mais
-  recentemente, a fila de revisões pendentes e um atalho para importar CSV.
-- **Estudantes:** pesquisa e tabela de estudantes com identificador, e-mail,
-  notas de Matemática e História e estado de revisão. Permite cadastrar,
-  atualizar notas/estado da revisão e excluir registros. O formulário de
-  edição mantém nome e e-mail como dados não editáveis.
-- **Revisões:** fila de pedidos enviados pelos estudantes, com justificativa e
-  nota original. O professor pode responder, ajustar a nota ou encerrar o
-  pedido sem alteração; também pode excluir pedidos pendentes.
-- **Importar dados:** envio por seleção ou arrastar-e-soltar de um arquivo CSV
-  UTF-8. O resultado mostra processados, atualizados, itens em cache,
-  duplicados, falhas, erros por linha, tokens, custo estimado, duração,
-  duração média e p95 por estudante, provedores e identificador da execução.
-  Informa também se houve fallback por template, teto de custo ou conflito com
-  outra execução.
-- **Semestres:** cadastro dos períodos letivos e acompanhamento do estado
-  (aberto, a fechar ou fechado), datas e leitura das notificações. **Fechar e
-  notificar** cria os boletins personalizados do período; **Reenviar
-  pendentes** tenta novamente apenas as entregas que faltam. A área de
-  entregas detalha notas por estudante, origem do resumo (LLM, template ou
-  cache), estado do e-mail e leitura na app.
-- **Métricas:** visão de execução com processados, falhas, custo de tokens e
-  tempo médio; eficiência/FinOps com cache, falhas, fallbacks, custo médio e
-  limites; saúde operacional com HTTP, erros 5xx, latência p50/p95, retries,
-  throttling, rate limits e circuit breakers LLM/SMTP; e histórico das últimas
-  execuções. Atualiza automaticamente a cada 15 segundos enquanto a aba está
-  visível e também tem atualização manual. Dados emulados são identificados
-  quando habilitados.
-- **Definições:** item informativo ainda não implementado; ao selecionar,
-  informa que as definições estarão disponíveis futuramente.
-- **Ajuda e suporte:** atalho para a documentação interativa da API (`/docs`).
-- **Estado do sistema:** no topo, indica sistema operacional ou sugere
-  verificar a conexão; o botão adjacente atualiza os dados do painel. O menu do
-  perfil encerra a sessão.
-
-### Perfil de estudante
-
-- **Visão geral:** cartões com as notas de Matemática e História, estado de
-  pedidos de revisão e, quando já houver decisão, a resposta do professor.
-  Permite pedir revisão mediante justificativa; pedidos pendentes ficam
-  identificados como em análise. Também mostra as notificações mais recentes.
-- **Notificações:** caixa de entrada com filtros para todas, não lidas,
-  boletins, atualizações de notas e decisões de revisão. Abrir uma notificação
-  marca-a como lida; há também ação para marcar todas como lidas. A contagem
-  de não lidas aparece no menu e no ícone de sino.
-- **Estado do sistema e sessão:** o estudante também pode atualizar os dados,
-  verificar o estado da conexão e encerrar a sessão.
-
-As notificações temporárias confirmam operações, alertam sobre validações ou
-falhas e destacam novos pedidos/notificações. Ações destrutivas e decisões de
-revisão/fechamento pedem confirmação antes de serem executadas.
+O painel exibe dados da API conforme o perfil autenticado.
 
 ## Arquitetura
 
@@ -244,35 +191,6 @@ se o servidor reiniciar. Essas decisões são apropriadas para a demonstração;
 uma implantação horizontal exigiria fila durável, outbox, banco compartilhado
 e coordenação distribuída.
 
-### Melhorias futuras: processamento distribuído e atualizações em tempo real
-
-A aplicação já oferece processamento assíncrono, mas as tarefas são mantidas
-em memória. Para uma implantação com múltiplas instâncias, uma evolução
-possível é usar **RabbitMQ** para enfileirar uploads e fechamentos de períodos,
-com workers independentes, retries controlados, confirmação de mensagens e
-fila de falhas. O estado persistido no banco continua sendo a fonte oficial;
-o padrão outbox pode evitar inconsistências entre gravar uma operação e
-publicar seu evento.
-
-Para informar o painel sobre progresso, conclusão de execuções e novas
-notificações, pode-se adicionar **WebSocket**. Se a comunicação necessária for
-apenas do servidor para o cliente, **SSE** também deve ser avaliado por ser
-mais simples. Em qualquer opção, o cliente recupera o estado atualizado pela
-API após reconexões.
-
-**Kafka** é uma alternativa para cenários de maior volume, múltiplos
-consumidores independentes, retenção e reprocessamento de eventos. Não é
-necessário adotá-lo junto com RabbitMQ para o fluxo atual; a escolha deve
-refletir as necessidades de escala e análise.
-
-O resumo por template já existe como fallback determinístico. Um modo
-explicitamente configurável para gerar resumos sem chamar um LLM pode ser
-adicionado sem transformar a aplicação em microserviços. A arquitetura atual
-pode permanecer como monólito modular; como passo inicial de distribuição, um
-worker pode ser extraído e serviços adicionais, como um gateway de WebSocket,
-podem ser separados quando houver necessidade operacional. Essas tecnologias
-são possibilidades futuras, não componentes implementados.
-
 ## Testes e qualidade
 
 Execute todas as verificações a partir da raiz:
@@ -290,23 +208,12 @@ separadamente:
 (cd frontend && pnpm test)
 ```
 
-**Resultados medidos nesta versão:** backend com **121 testes passando e 90%
-de cobertura de linhas/declarações** (2.926 declarações medidas, pytest-cov);
-frontend com **46 testes passando em 4 arquivos**. O projeto frontend ainda
-não configura um provedor de instrumentação de cobertura do Vitest, então não
-há um percentual frontend medido — quantidade de testes não deve ser
-interpretada como percentual de cobertura. Os números podem mudar quando os
-testes ou o código mudarem.
-
-Os testes backend não dependem de chamadas reais ao LLM ou ao SMTP. O
-[`guia de testes`](docs/GUIA_DE_TESTES.md) descreve como validar os critérios e
-reproduzir cenários com a API em execução.
+Os testes não dependem de chamadas reais ao LLM ou ao SMTP. O
+[guia de testes](docs/GUIA_DE_TESTES.md) descreve os cenários de validação.
 
 ## Endpoints da API
 
-São **29 operações de negócio** na API FastAPI. A contagem exclui as rotas
-automáticas de documentação do FastAPI (`/docs`, `/redoc` e `/openapi.json`) e
-as rotas internas do proxy Next.js.
+API FastAPI; `/docs` lista parâmetros, schemas e respostas.
 
 | Grupo | Método e rota | Para que serve |
 | --- | --- | --- |
@@ -340,15 +247,11 @@ as rotas internas do proxy Next.js.
 |  | `POST /notifications/me/read-all` | Marca todas as notificações do estudante como lidas. |
 |  | `PATCH /notifications/{notification_id}/read` | Marca uma notificação própria como lida. |
 
-As operações protegidas exigem um token de acesso no cabeçalho de autorização
-e verificam o papel professor/estudante conforme a ação. `/docs` lista
-parâmetros, modelos e respostas disponíveis.
+Operações protegidas exigem token de acesso e autorização conforme o papel.
 
 ### Envelope de resposta
 
-Respostas de sucesso usam o envelope genérico:
-
-Exemplo (mensagem ilustrativa):
+Respostas usam um envelope comum:
 
 ```json
 {
@@ -359,13 +262,12 @@ Exemplo (mensagem ilustrativa):
 }
 ```
 
-`data` contém o objeto, lista ou valor do resultado. Em listas paginadas,
-`pagination` contém `pageNumber`, `pageSize`, `totalRecords`, `totalPages`,
-`hasNextPage` e `hasPreviousPage`. As chaves de schemas usam `camelCase`.
+`data` contém o resultado. Em listas paginadas, `pagination` informa página,
+tamanho, total de registros e páginas e indicadores de navegação. Schemas usam
+chaves `camelCase`.
 
-Erros seguem o mesmo envelope, com `success: false`, `data: []` e uma lista
-`errors`; cada erro pode informar o campo (`field`), código estável (`code`) e
-mensagem (`message`). O status HTTP continua a distinguir a classe do erro:
+Erros usam `success: false`, `data: []` e `errors`, com campo, código e
+mensagem quando aplicável. O status HTTP identifica a classe do erro.
 
 ```json
 {
@@ -384,71 +286,46 @@ mensagem (`message`). O status HTTP continua a distinguir a classe do erro:
 
 ### Erros de negócio e erros do sistema
 
-- **Erro de negócio**: a requisição foi entendida, mas não pode ser concluída
-  porque viola uma regra válida do domínio ou entra em conflito com o estado
-  atual. Exemplos: estudante duplicado (`409`), período já fechado ou em
-  conflito (`409`), recurso inexistente (`404`) e ação não permitida para o
-  papel (`403`). O cliente pode corrigir os dados, aguardar ou escolher outra
-  ação; repetir a mesma requisição sem mudança normalmente não resolve.
-- **Erro de validação**: entrada malformada ou incompatível com o schema, por
-  exemplo campo obrigatório ausente ou tipo inválido (`422`). Em CSV, erros de
-  linhas individuais também podem aparecer como itens de validação no
-  relatório da execução, sem necessariamente interromper o lote inteiro.
-- **Erro do sistema**: falha técnica não causada por uma regra de negócio,
-  como indisponibilidade de banco/provedor ou exceção não tratada (`5xx`).
-  `500` retorna mensagem genérica ao cliente; a exceção fica nos logs com o
-  identificador da requisição. `503` também pode indicar configuração inválida
-  no servidor. Uma falha transitória pode justificar nova tentativa, respeitando
-  `Retry-After` quando enviado; erro de configuração exige correção operacional.
+- **Negócio:** conflito ou regra violada (`403`, `404` ou `409`).
+- **Validação:** entrada incompatível com o schema (`422`); erros de linhas
+  CSV também aparecem no relatório da execução.
+- **Sistema:** falha técnica (`5xx`). `500` retorna mensagem genérica e registra
+  detalhes nos logs com o ID da requisição. Em falhas transitórias, respeite
+  `Retry-After` quando enviado.
 
 ### Segurança e controles
 
-Para a demonstração local, o projeto tem **controles básicos/intermediários de
-aplicação**, mas não é certificado por auditoria ou teste de intrusão e não
-deve ser tratado como pronto para produção sem endurecimento adicional.
+Controles implementados para a demonstração:
 
-- Access/refresh tokens JWT; access tokens de curta duração, refresh tokens
-  rotacionáveis e revogáveis.
-- Senhas armazenadas com PBKDF2-HMAC-SHA256 (310.000 iterações) e comparação
-  resistente a timing.
-- No browser, tokens são guardados em cookies `HttpOnly`, `SameSite=Lax` e
-  `Secure` em produção; rotas de sessão validam a origem. O frontend não expõe
-  os tokens ao JavaScript da página.
-- Autorização por papel e escopo do estudante; estudante não pode consultar
-  dados de outro estudante. CORS restringido às origens configuradas.
-- Rate limiting para login/refresh, uploads e fechamento de período; limites de
-  tamanho e validação do CSV; rate limiting/throttling nas chamadas aos
-  provedores.
-- `.env` local com segredos aleatórios é criado pelo script e não deve ser
-  versionado. Logs mascaram e-mails e não registram o texto dos boletins.
+- JWT com access/refresh tokens; refresh rotacionável e revogável.
+- Senhas com PBKDF2-HMAC-SHA256 (310.000 iterações).
+- Cookies `HttpOnly`, `SameSite=Lax` e `Secure` em produção; validação de
+  origem nas rotas de sessão. O JavaScript do frontend não acessa os tokens.
+- Autorização por papel e escopo, CORS por origem e rate limiting para login,
+  uploads, fechamento de período e provedores.
+- Validação e limite de tamanho do CSV. Logs mascaram e-mails e não registram
+  o texto dos boletins.
 
-Limitações relevantes: contas de demonstração e modo mock são para uso local;
-rate limits e circuit breakers são por processo; SQLite e tarefas assíncronas
-em memória não oferecem coordenação distribuída ou fila durável. Antes de
-exposição pública, configure identidade real, segredos e TLS em infraestrutura
-segura, revise proxy confiável e políticas operacionais, e faça revisão de
-segurança adequada ao ambiente.
+Contas de demonstração e modo mock são para uso local. Rate limits e circuit
+breakers são por processo; SQLite e tarefas assíncronas em memória não
+oferecem coordenação distribuída nem fila durável.
 
-## Escopo e próximos passos para produção
+## Melhorias e implantação em AWS
 
-O cadastro de alunos, login, revisões de nota e períodos acadêmicos foram
-incluídos para demonstrar o fluxo de ponta a ponta. Para uma implantação
-produtiva de maior escala, os próximos passos seriam:
+As evoluções abaixo não estão implementadas. A aplicação pode continuar como
+monólito modular, extraindo workers apenas quando necessário:
 
-- substituir o SQLite por PostgreSQL;
-- executar o processamento assíncrono em RabbitMQ e workers; avaliar Kafka
-  apenas se surgirem necessidades de streaming, retenção ou múltiplos
-  consumidores independentes;
-- avaliar WebSocket para atualizações bidirecionais em tempo real ou SSE para
-  atualizações apenas do servidor para o painel;
-- disponibilizar uma configuração explícita de geração por template sem
-  chamadas a LLM;
-- mover rate limits e estado dos circuit breakers para uma solução
-  compartilhada, como Redis;
-- integrar tracing a um collector OpenTelemetry e exportar métricas para
-  Prometheus;
-- usar um provedor de notificação com suporte a chave de idempotência para
-  reduzir a janela de duplicidade.
-
-O [guia de testes](docs/GUIA_DE_TESTES.md) contém os roteiros de demonstração
-e os trade-offs que podem ser aprofundados no debriefing.
+- **Dados e escala:** substituir SQLite por PostgreSQL e compartilhar rate
+  limits/circuit breakers em Redis.
+- **Processamento:** usar uma fila durável e workers separados. RabbitMQ atende
+  o fluxo atual; Kafka só se justifica com necessidade de retenção,
+  reprocessamento ou múltiplos consumidores independentes. Outbox e
+  idempotência reduzem inconsistências e envios duplicados.
+- **Resiliência e operação:** oferecer geração por template sem LLM; adicionar
+  WebSocket ou SSE para atualizações; instrumentar tracing com OpenTelemetry e
+  métricas com Prometheus.
+- **API do painel:** manter REST para autenticação, escrita, uploads e
+  execuções. Adicionar GraphQL para consultas agregadas de leitura, como a
+  visão geral do professor ou do estudante. O Next.js/BFF consumiria esse
+  endpoint; resolvers devem reutilizar serviços de aplicação, aplicar
+  autorização por papel/escopo e limitar consultas custosas e N+1.
