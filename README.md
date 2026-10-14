@@ -310,7 +310,7 @@ Contas de demonstração e modo mock são para uso local. Rate limits e circuit
 breakers são por processo; SQLite e tarefas assíncronas em memória não
 oferecem coordenação distribuída nem fila durável.
 
-## Melhorias e implantação em AWS
+## Melhorias
 
 As evoluções abaixo não estão implementadas. A aplicação pode continuar como
 monólito modular, extraindo workers apenas quando necessário:
