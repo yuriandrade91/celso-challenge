@@ -494,7 +494,7 @@ git -C .. check-ignore backend/.env && echo ".env ignorado pelo git"
 ## Limitações do ambiente de demonstração
 
 Estas limitações são intencionais e estão justificadas no README, em
-"Arquitetura" e "Melhorias e implantação em AWS":
+"Arquitetura" e "Melhorias":
 
 - Os limites (token bucket, janelas, circuit breakers) são **por processo**.
   Com várias réplicas, seria preciso Redis.
