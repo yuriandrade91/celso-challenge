@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: backend + frontend",
+      "detail": "Prepara o ambiente se faltar algo e sobe API (8000) e painel (3000)",
+      "type": "shell",
+      "command": "make dev",
+      "group": { "kind": "build", "isDefault": true },
+      "isBackground": true,
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Testes: backend + frontend",
+      "type": "shell",
+      "command": "make test",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

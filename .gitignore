@@ -1,0 +1,23 @@
+# Python environments and test artifacts
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local configuration and databases
+.env
+backend/.env
+backend/backoffice.db
+
+# Next.js and Node.js artifacts
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/coverage/
+frontend/tsconfig.tsbuildinfo
+
+# Editor and operating-system artifacts
+.DS_Store
