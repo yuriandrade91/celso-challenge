@@ -244,6 +244,35 @@ se o servidor reiniciar. Essas decisões são apropriadas para a demonstração;
 uma implantação horizontal exigiria fila durável, outbox, banco compartilhado
 e coordenação distribuída.
 
+### Melhorias futuras: processamento distribuído e atualizações em tempo real
+
+A aplicação já oferece processamento assíncrono, mas as tarefas são mantidas
+em memória. Para uma implantação com múltiplas instâncias, uma evolução
+possível é usar **RabbitMQ** para enfileirar uploads e fechamentos de períodos,
+com workers independentes, retries controlados, confirmação de mensagens e
+fila de falhas. O estado persistido no banco continua sendo a fonte oficial;
+o padrão outbox pode evitar inconsistências entre gravar uma operação e
+publicar seu evento.
+
+Para informar o painel sobre progresso, conclusão de execuções e novas
+notificações, pode-se adicionar **WebSocket**. Se a comunicação necessária for
+apenas do servidor para o cliente, **SSE** também deve ser avaliado por ser
+mais simples. Em qualquer opção, o cliente recupera o estado atualizado pela
+API após reconexões.
+
+**Kafka** é uma alternativa para cenários de maior volume, múltiplos
+consumidores independentes, retenção e reprocessamento de eventos. Não é
+necessário adotá-lo junto com RabbitMQ para o fluxo atual; a escolha deve
+refletir as necessidades de escala e análise.
+
+O resumo por template já existe como fallback determinístico. Um modo
+explicitamente configurável para gerar resumos sem chamar um LLM pode ser
+adicionado sem transformar a aplicação em microserviços. A arquitetura atual
+pode permanecer como monólito modular; como passo inicial de distribuição, um
+worker pode ser extraído e serviços adicionais, como um gateway de WebSocket,
+podem ser separados quando houver necessidade operacional. Essas tecnologias
+são possibilidades futuras, não componentes implementados.
+
 ## Testes e qualidade
 
 Execute todas as verificações a partir da raiz:
@@ -407,7 +436,13 @@ incluídos para demonstrar o fluxo de ponta a ponta. Para uma implantação
 produtiva de maior escala, os próximos passos seriam:
 
 - substituir o SQLite por PostgreSQL;
-- executar o processamento assíncrono em uma fila durável e workers;
+- executar o processamento assíncrono em RabbitMQ e workers; avaliar Kafka
+  apenas se surgirem necessidades de streaming, retenção ou múltiplos
+  consumidores independentes;
+- avaliar WebSocket para atualizações bidirecionais em tempo real ou SSE para
+  atualizações apenas do servidor para o painel;
+- disponibilizar uma configuração explícita de geração por template sem
+  chamadas a LLM;
 - mover rate limits e estado dos circuit breakers para uma solução
   compartilhada, como Redis;
 - integrar tracing a um collector OpenTelemetry e exportar métricas para
