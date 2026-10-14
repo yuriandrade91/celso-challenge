@@ -386,14 +386,15 @@ critério 2.
 
 ## 9. Testes Automatizados
 
-**O que foi feito:** 101 testes em 9 arquivos:
+**O que foi feito:** testes automatizados em 11 arquivos:
 
 | Tipo | Arquivos |
 | --- | --- |
 | Unitários de regra de negócio | `test_business.py`, `test_resilience.py` |
 | Contrato com os provedores | `test_providers.py` (formato do pedido e da resposta da OpenAI, SMTP) |
-| Integração da API | `test_upload_api.py`, `test_students.py`, `test_reviews.py`, `test_seed.py` |
-| Observabilidade e rate limit | `test_observability.py`, `test_rate_limit.py` |
+| Integração da API | `test_upload_api.py`, `test_students.py`, `test_reviews.py`, `test_seed.py`, `test_terms.py` |
+| Observabilidade e métricas | `test_observability.py`, `test_demo_metrics.py` |
+| Rate limit | `test_rate_limit.py` |
 
 ```bash
 ../.venv/bin/python -m pytest -q --cov=app --cov-report=term-missing
@@ -402,7 +403,7 @@ critério 2.
 Nenhum teste acessa a rede. Os tempos são controlados por relógios e
 `sleep` falsos.
 
-No frontend, `frontend/tests/` tem 46 testes (Vitest). Eles cobrem a
+No frontend, os quatro arquivos em `frontend/tests/` usam Vitest e cobrem a
 allowlist do proxy, a proteção CSRF por origem, a leitura do envelope de erro
 da API e os formatadores do painel. `make check` roda tudo e mostra o resumo.
 
@@ -493,7 +494,7 @@ git -C .. check-ignore backend/.env && echo ".env ignorado pelo git"
 ## Limitações do ambiente de demonstração
 
 Estas limitações são intencionais e estão justificadas no README, em
-"Decisions not implemented":
+"Arquitetura" e "Melhorias e implantação em AWS":
 
 - Os limites (token bucket, janelas, circuit breakers) são **por processo**.
   Com várias réplicas, seria preciso Redis.

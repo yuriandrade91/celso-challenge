@@ -251,20 +251,39 @@ Operações protegidas exigem token de acesso e autorização conforme o papel.
 
 ### Envelope de resposta
 
-Respostas usam um envelope comum:
+Respostas usam um envelope comum. Exemplo ilustrativo de `GET /students/`
+(requer autenticação de professor), com os query params
+`pageSize=10&pageNumber=1`:
 
 ```json
 {
   "success": true,
-  "data": {},
-  "pagination": null,
+  "data": [
+    {
+      "studentId": "0d2ccf31-8ed0-43a4-8554-18813dbdd001",
+      "name": "Ana Martins",
+      "email": "ana.martins@example.com",
+      "mathGrade": 17.0,
+      "historyGrade": 15.0,
+      "reviewRequested": false
+    }
+  ],
+  "pagination": {
+    "pageNumber": 1,
+    "pageSize": 10,
+    "totalRecords": 1,
+    "totalPages": 1,
+    "hasNextPage": false,
+    "hasPreviousPage": false
+  },
   "errors": null
 }
 ```
 
 `data` contém o resultado. Em listas paginadas, `pagination` informa página,
-tamanho, total de registros e páginas e indicadores de navegação. Schemas usam
-chaves `camelCase`.
+tamanho, total de registros e páginas e indicadores de navegação. Os
+parâmetros aceitos são `pageNumber` e `pageSize`; schemas usam chaves
+`camelCase`.
 
 Erros usam `success: false`, `data: []` e `errors`, com campo, código e
 mensagem quando aplicável. O status HTTP identifica a classe do erro.
